@@ -1,0 +1,21 @@
+{
+    "default": {
+        "includeSunday": true,
+        "lastSunday": 1
+    },
+    "category": [
+        {
+            "name": "",
+            "slug": ""
+        },
+        {
+            "name": "ダニエル",
+            "slug": "daniel"
+        }
+    ],
+    "path": {
+        "templateDir": "brigandine",
+        "templateFile": "whitesword.md",
+        "distDir": "dist"
+    }
+}
