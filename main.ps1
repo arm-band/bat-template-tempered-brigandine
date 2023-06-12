@@ -192,11 +192,11 @@ if (Assert-ExistFile $configPath) {
         # エラーにならなかった場合は値を書き換える
         $beforeSunday = $beforeSundayTemp
     }
-    Write-Host([String]$beforeSunday + '週間前の日曜日は' + (Get-Date).AddDays($lastSunday * $beforeSunday).ToString("MM/dd") + 'です。')
+    Write-Host([String]$beforeSunday + '週間前の日曜日は' + (Get-Date).AddDays($lastSunday * $beforeSunday * 7).ToString("MM/dd") + 'です。')
     Write-Host `r`n
     # 日曜日を含むかどうかはデフォルト値をセット
     $includeSunday = $configData.default.includeSunday
-    $includeSundayStr = Read-Host((Get-Date).AddDays($lastSunday * $beforeSunday).ToString("MM/dd") + 'を生成する日付に含めますか？ [yes(y)/no(n)], default:' + $configData.default.includeSunday + ' ')
+    $includeSundayStr = Read-Host((Get-Date).AddDays($lastSunday * $beforeSunday * 7).ToString("MM/dd") + 'を生成する日付に含めますか？ [yes(y)/no(n)], default:' + $configData.default.includeSunday + ' ')
     if (Assert-ParamStrGTZero $includeSundayStr) {
         # 入力文字列があった場合に書き換え
         if (-not ($includeSundayStr -eq 'y') -And -not ($includeSundayStr -eq 'Y') -And -not ($includeSundayStr -eq 'n') -And -not ($includeSundayStr -eq 'N')) {
@@ -212,7 +212,7 @@ if (Assert-ExistFile $configPath) {
             $includeSunday = $False
         }
     }
-    $days = $lastSunday * $beforeSunday
+    $days = $lastSunday * $beforeSunday * 7
     if (-not $includeSunday) {
         # 日曜日を含まない場合は +1日 する
         $days = $days + 1
