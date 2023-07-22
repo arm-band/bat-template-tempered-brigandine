@@ -168,7 +168,7 @@ if (Assert-ExistFile $configPath) {
     $todaysDayOfWeek = (Get-Date).DayOfWeek.value__
 #    $todaysDayOfWeek = (Get-Date $date).DayOfWeek.value__
     if (-not ($todaysDayOfWeek -eq 0)) {
-        # 日曜日(0)以外ならば曜日の日付を負の整数にする
+        # 日曜日(0)以外ならば曜日の日付を負の整数にして1週間の日数に揃える
         $lastSunday = -1 * $todaysDayOfWeek
     }
     # $lastSunday の日数分遡った日付とする
@@ -192,11 +192,21 @@ if (Assert-ExistFile $configPath) {
         # エラーにならなかった場合は値を書き換える
         $beforeSunday = $beforeSundayTemp
     }
-    Write-Host([String]$beforeSunday + '週間前の日曜日は' + (Get-Date).AddDays($lastSunday * $beforeSunday * 7).ToString("MM/dd") + 'です。')
+    $goBackDays = $lastSunday * $beforeSunday
+    if (-not ($lastSunday -eq -7)) {
+        # 1週間の日曜日が7日前(=実行日が日曜日)以外の場合はX週間前の日曜日を計算する
+        $goBackDays = $lastSunday - (7 * ($beforeSunday - 1))
+    }
+#    Write-Host $lastSunday
+#    Write-Host $beforeSunday
+#    Write-Host (7 * ($beforeSunday - 1))
+#    Write-Host $goBackDays
+#    Write-Host (Get-Date).AddDays($goBackDays).ToString("MM/dd")
+    Write-Host([String]$beforeSunday + '週間前の日曜日は' + (Get-Date).AddDays($goBackDays).ToString("MM/dd") + 'です。')
     Write-Host `r`n
     # 日曜日を含むかどうかはデフォルト値をセット
     $includeSunday = $configData.default.includeSunday
-    $includeSundayStr = Read-Host((Get-Date).AddDays($lastSunday * $beforeSunday * 7).ToString("MM/dd") + 'を生成する日付に含めますか？ [yes(y)/no(n)], default:' + $configData.default.includeSunday + ' ')
+    $includeSundayStr = Read-Host((Get-Date).AddDays($goBackDays).ToString("MM/dd") + 'を生成する日付に含めますか？ [yes(y)/no(n)], default:' + $configData.default.includeSunday + ' ')
     if (Assert-ParamStrGTZero $includeSundayStr) {
         # 入力文字列があった場合に書き換え
         if (-not ($includeSundayStr -eq 'y') -And -not ($includeSundayStr -eq 'Y') -And -not ($includeSundayStr -eq 'n') -And -not ($includeSundayStr -eq 'N')) {
@@ -212,7 +222,7 @@ if (Assert-ExistFile $configPath) {
             $includeSunday = $False
         }
     }
-    $days = $lastSunday * $beforeSunday * 7
+    $days = $goBackDays
     if (-not $includeSunday) {
         # 日曜日を含まない場合は +1日 する
         $days = $days + 1
